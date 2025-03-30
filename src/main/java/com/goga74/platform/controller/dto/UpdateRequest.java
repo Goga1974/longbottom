@@ -1,4 +1,4 @@
-package com.goga74.platform.dto;
+package com.goga74.platform.controller.dto;
 
 public class UpdateRequest {
 

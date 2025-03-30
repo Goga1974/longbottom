@@ -1,6 +1,5 @@
-package com.goga74.platform.dto;
+package com.goga74.platform.controller.dto;
 
-import com.goga74.platform.DB.entity.ItemEntity;
 import com.google.gson.annotations.Expose;
 import java.util.List;
 
@@ -10,8 +9,8 @@ public class CommonResponse
     private String status;
     @Expose
     private String message;
-    @Expose
-    private Item data; // Assuming data is of type Item
+    //@Expose
+    //private Item data; // Assuming data is of type Item
     @Expose
     private String userId;
     @Expose
@@ -41,6 +40,7 @@ public class CommonResponse
         return this;
     }
 
+    /*
     public Item getData()
     {
         return data;
@@ -51,6 +51,7 @@ public class CommonResponse
         this.data = data;
         return this;
     }
+    */
 
     public String getUserId()
     {

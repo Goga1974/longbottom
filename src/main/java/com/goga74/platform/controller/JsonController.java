@@ -3,9 +3,8 @@ package com.goga74.platform.controller;
 import com.goga74.platform.DB.entity.UserEntity;
 import com.goga74.platform.DB.entity.ItemEntity;
 import com.goga74.platform.DB.repository.DataRepository;
-import com.goga74.platform.dto.*;
+import com.goga74.platform.controller.dto.*;
 import com.goga74.platform.util.JsonUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,6 @@ import com.google.gson.reflect.TypeToken;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -31,7 +29,8 @@ public class JsonController
 {
     private final DataRepository dataRepository;
 
-    public JsonController(DataRepository dataRepository) {
+    public JsonController(DataRepository dataRepository)
+    {
         this.dataRepository = dataRepository;
     }
 
@@ -52,22 +51,67 @@ public class JsonController
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse> loginUser(@RequestBody LoginRequest request)
+    public CommonResponse loginUser(@RequestBody LoginRequest request)
     {
-        Optional<UserEntity> userOptional = dataRepository.findById(request.getUserId());
-        if (userOptional.isPresent())
+        if (request != null)
         {
+            final String userId = request.getUserId();
+            Optional<UserEntity> userOptional = dataRepository.findById(userId);
+            if (userOptional.isEmpty())
+            {
+                return new CommonResponse()
+                        .setStatus("error")
+                        .setMessage("User not found")
+                        .setUserId(request.getUserId());
+            }
+
             UserEntity user = userOptional.get();
             // Using TypeToken to specify the exact type
             Type itemListType = new TypeToken<List<ItemEntity>>() {}.getType();
             List<Item> items = JsonUtil.convertFromJson(user.getData(), itemListType);
-            CommonResponse response = new CommonResponse();
-            response.setUserId(user.getUserId());
-            response.setUserName(user.getUserName());
-            response.setItems(items);
-            return ResponseEntity.ok(response);
+
+            return new CommonResponse()
+                    .setStatus("success")
+                    .setUserId(userId)
+                    .setUserName(user.getUserName())
+                    .setItems(items)
+                    .setMessage("User data retrieved successfully");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return new CommonResponse()
+            .setStatus("error")
+            .setMessage("userId is null");
+    }
+
+    @Operation(summary = "Get user data by user ID",
+            description = "Retrieve detailed user information along with associated items by user ID.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful retrieval of user data",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = CommonResponse.class))),
+        @ApiResponse(responseCode = "404", description = "User not found",
+                content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping("/user/{userId}")
+    public CommonResponse getUserById(@PathVariable String userId)
+    {
+        Optional<UserEntity> userOptional = dataRepository.findById(userId);
+        if (userOptional.isEmpty())
+        {
+            return new CommonResponse()
+                    .setStatus("error")
+                    .setMessage("User not found")
+                    .setUserId(userId);
+        }
+        UserEntity user = userOptional.get();
+        // Using TypeToken to specify the exact type
+        Type itemListType = new TypeToken<List<ItemEntity>>() {}.getType();
+        List<Item> items = JsonUtil.convertFromJson(user.getData(), itemListType);
+        return new CommonResponse()
+                .setStatus("success")
+                .setUserId(userId)
+                .setUserName(user.getUserName())
+                .setItems(items)
+                .setMessage("User data retrieved successfully");
     }
 
     @Operation(summary = "Update user data", description = "Update the data of a user.")

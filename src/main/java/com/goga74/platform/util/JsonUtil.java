@@ -1,7 +1,7 @@
 package com.goga74.platform.util;
 
 import com.goga74.platform.DB.entity.ItemEntity;
-import com.goga74.platform.dto.Item;
+import com.goga74.platform.controller.dto.Item;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.List;

@@ -1,15 +1,10 @@
-package com.goga74.platform.cache;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.goga74.platform.dto.User;
+package com.goga74.platform.service.cache;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.goga74.platform.controller.dto.User;
 
 public class CacheService
 {

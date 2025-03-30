@@ -1,6 +1,4 @@
-package com.goga74.platform.dto;
-
-import com.goga74.platform.DB.entity.ItemEntity;
+package com.goga74.platform.controller.dto;
 
 import java.util.Collection;
 import java.util.List;

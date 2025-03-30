@@ -1,4 +1,4 @@
-package com.goga74.platform.dto;
+package com.goga74.platform.controller.dto;
 
 import com.google.gson.annotations.Expose;
 
@@ -10,7 +10,9 @@ public class Item
     private String itemName;
     @Expose
     private String data;
-    private String formattedData; // Example of an additional field if needed
+
+    // Example of an additional field if needed
+    //private String formattedData;
 
     public String getItemId() {
         return itemId;
@@ -37,11 +39,12 @@ public class Item
     public Item setData(String data) {
         this.data = data;
         // Example of formatting or processing data
-        this.formattedData = formatData(data);
+        //this.formattedData = formatData(data);
         return this;
     }
 
     // Method for formatting data if needed
+    /*
     private String formatData(String data) {
         // Example of data processing
         return data.trim();
@@ -50,4 +53,5 @@ public class Item
     public String getFormattedData() {
         return formattedData;
     }
+     */
 }
