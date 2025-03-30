@@ -1,0 +1,13 @@
+.idea/
+*.iml
+*.iws
+*.log
+.classpath
+.project
+.settings/
+target/
+out/
+lib/
+_tst/
+/resources/deploy/
+build/

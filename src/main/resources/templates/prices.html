@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electricity Prices</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            /*width: 100%;*/
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        th, td {
+            border: 1px solid black; /* Тонкая чёрная рамка */
+            padding: 5px; /* Пространство внутри ячеек */
+        }
+
+        .min-price {
+            background-color: green; /* Зеленый цвет для минимальной цены */
+            color: white; /* Белый текст */
+        }
+
+        .current-interval {
+            background-color: yellow; /* Жёлтый цвет для текущего интервала */
+            color: black; /* Чёрный текст */
+        }
+
+    </style>
+</head>
+<body>
+
+<h1 th:text="${header}"></h1>
+<h3>Electricity Prices by Hour</h3>
+
+<table>
+    <thead>
+    <tr>
+        <th>Interval</th>
+        <th>Price (€/MWh)</th>
+    </tr>
+    </thead>
+    <tbody th:each="entry : ${prices}">
+    <tr>
+        <td th:text="${entry.interval}" th:classappend="${entry.isCurrentInterval} ? 'current-interval' : ''"></td>
+        <td th:text="${entry.priceAsString}" th:classappend="${entry.isMinPrice} ? 'min-price' : ''"></td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/">Today Prices</a><br/>
+<a href="/tomorrow">Tomorrow Prices</a>
+
+</body>
+</html>
