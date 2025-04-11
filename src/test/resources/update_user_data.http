@@ -1,0 +1,8 @@
+### Update User Data
+POST http://localhost:8074/api/update
+Content-Type: application/json
+
+{
+  "userId": "123",
+  "data": "[{\"itemId\":\"item1\",\"itemName\":\"Updated Item One\"}]"
+}

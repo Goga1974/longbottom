@@ -1,0 +1,14 @@
+### Create User
+POST http://localhost:8074/api/create
+Content-Type: application/json
+
+{
+  "userId": "123",
+  "userName": "John Doe",
+  "items": [
+    {
+      "itemId": "item1",
+      "itemName": "Item One"
+    }
+  ]
+}

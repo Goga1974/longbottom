@@ -1,0 +1,18 @@
+### Handle Transaction
+POST http://localhost:8074/api/transaction
+Content-Type: application/json
+
+{
+  "userId": "123",
+  "itemsDelete": [
+    {
+      "itemId": "item1"
+    }
+  ],
+  "itemsAdd": [
+    {
+      "itemId": "item2",
+      "itemName": "Item Two"
+    }
+  ]
+}

@@ -104,7 +104,7 @@ public class JsonController
         }
         UserEntity user = userOptional.get();
         // Using TypeToken to specify the exact type
-        Type itemListType = new TypeToken<List<ItemEntity>>() {}.getType();
+        Type itemListType = new TypeToken<List<Item>>() {}.getType();
         List<Item> items = JsonUtil.convertFromJson(user.getData(), itemListType);
         return new CommonResponse()
                 .setStatus("success")
@@ -142,7 +142,8 @@ public class JsonController
         {
             UserEntity user = userOptional.get();
             // Deserialize the current items
-            Type itemListType = new TypeToken<List<ItemEntity>>() {}.getType();
+            //Type itemListType = new TypeToken<List<ItemEntity>>() {}.getType();
+            Type itemListType = new TypeToken<List<Item>>() {}.getType();
             List<Item> currentItems = JsonUtil.convertFromJson(user.getData(), itemListType);
 
             // Extract item IDs from currentItems
