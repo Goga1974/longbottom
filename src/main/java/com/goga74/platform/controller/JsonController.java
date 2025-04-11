@@ -1,11 +1,13 @@
 package com.goga74.platform.controller;
 
 import com.goga74.platform.DB.entity.RequestLog;
+import com.goga74.platform.DB.entity.UnlockedEntity;
 import com.goga74.platform.DB.entity.UserEntity;
 import com.goga74.platform.DB.entity.ItemEntity;
 import com.goga74.platform.DB.repository.DataRepository;
 import com.goga74.platform.DB.repository.ItemRepository;
 import com.goga74.platform.DB.repository.RequestLogRepository;
+import com.goga74.platform.DB.repository.UnlockedRepository;
 import com.goga74.platform.DB.service.DataService;
 import com.goga74.platform.controller.dto.*;
 import com.goga74.platform.util.JsonUtil;
@@ -47,15 +49,20 @@ public class JsonController
     private final DataRepository dataRepository;
     private final ItemRepository itemRepository;
     private final RequestLogRepository requestLogRepository;
+    private final UnlockedRepository unlockedRepository;
 
     //@Autowired
-    public JsonController(DataService dataService, DataRepository dataRepository,
-                          ItemRepository itemRepository, RequestLogRepository requestLogRepository)
+    public JsonController(DataService dataService,
+                          DataRepository dataRepository,
+                          ItemRepository itemRepository,
+                          RequestLogRepository requestLogRepository,
+                          UnlockedRepository unlockedRepository)
     {
         this.dataService = dataService;
         this.dataRepository = dataRepository;
         this.itemRepository = itemRepository;
         this.requestLogRepository = requestLogRepository;
+        this.unlockedRepository = unlockedRepository;
     }
 
     @PostMapping("/create")
@@ -99,43 +106,16 @@ public class JsonController
 
                 //dataService.saveItems(items);
                 itemRepository.saveAll(items);
-                response.put("message", "User and items created successfully");
-            } else {
-                response.put("ERROR_MESSAGE", "User already exists");
-            }
-        } catch (Exception e) {
-            response.put("ERROR_MESSAGE", "An error occurred: " + e.getMessage());
-        }
 
-        return ResponseEntity.ok(response);
-    }
-
-    /*
-    @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createUser(@RequestBody CreateRequest request) {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            Optional<UserEntity> existingUser = dataRepository.findById(request.getUserId());
-            if (existingUser.isEmpty()) {
-                UserEntity user = new UserEntity();
-                user.setUserId(request.getUserId());
-                user.setUserName(request.getUserName());
-                // user.setData(JsonUtil.convertToJson(request.getItems()));
-                dataRepository.save(user);
-
-                // Создаем и сохраняем элементы
-                List<ItemEntity> items = request.getItems().stream()
-                        .map(item -> {
-                            ItemEntity itemEntity = new ItemEntity();
-                            itemEntity.setItemId(item.getItemId());
-                            itemEntity.setUserId(request.getUserId());
-                            itemEntity.setCount(item.getCount());
-                            return itemEntity;
-                        })
-                        .collect(Collectors.toList());
-
-                dataService.saveItems(items);
+                // Сохранение в таблицу unlocked
+                if (!request.getUnlocked().isEmpty())
+                {
+                    UnlockedEntity unlockedEntity = new UnlockedEntity();
+                    unlockedEntity.setItemId(request.getUnlocked().get(0).getItemId());
+                    unlockedEntity.setUserId(request.getUserId());
+                    unlockedEntity.setCount(1);
+                    unlockedRepository.save(unlockedEntity);
+                }
 
                 response.put("message", "User and items created successfully");
             } else {
@@ -147,7 +127,6 @@ public class JsonController
 
         return ResponseEntity.ok(response);
     }
-     */
 
     @PostMapping("/login")
     public CommonResponse loginUser(@RequestBody LoginRequest request)
