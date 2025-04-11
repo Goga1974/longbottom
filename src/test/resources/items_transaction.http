@@ -3,16 +3,16 @@ POST http://localhost:8074/api/transaction
 Content-Type: application/json
 
 {
-  "userId": "123",
+  "userId": "124",
   "itemsDelete": [
     {
-      "itemId": "item1"
+      "itemId": "item2"
     }
   ],
   "itemsAdd": [
     {
-      "itemId": "item2",
-      "itemName": "Item Two"
+      "itemId": "item3",
+      "itemName": "Item Three"
     }
   ]
 }

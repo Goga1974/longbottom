@@ -10,10 +10,10 @@ public class UserEntity
     @Column(name = "user_id", nullable = false, unique = true)
     private String userId;
 
-    @Column(name = "user_name", nullable = false, unique = true)
+    @Column(name = "user_name")
     private String userName;
 
-    @Column(name = "data", columnDefinition = "JSON", nullable = false)
+    @Column(name = "data", columnDefinition = "JSON")
     private String data;
 
     public UserEntity() {}

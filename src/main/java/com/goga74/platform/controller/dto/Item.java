@@ -2,17 +2,14 @@ package com.goga74.platform.controller.dto;
 
 import com.google.gson.annotations.Expose;
 
-public class Item
-{
+public class Item {
+
     @Expose
     private String itemId;
     @Expose
-    private String itemName;
+    private String userId;
     @Expose
-    private String data;
-
-    // Example of an additional field if needed
-    //private String formattedData;
+    private int count;
 
     public String getItemId() {
         return itemId;
@@ -23,35 +20,21 @@ public class Item
         return this;
     }
 
-    public String getItemName() {
-        return itemName;
+    public String getUserId() {
+        return userId;
     }
 
-    public Item setItemName(String itemName) {
-        this.itemName = itemName;
+    public Item setUserId(String userId) {
+        this.userId = userId;
         return this;
     }
 
-    public String getData() {
-        return data;
+    public int getCount() {
+        return count;
     }
 
-    public Item setData(String data) {
-        this.data = data;
-        // Example of formatting or processing data
-        //this.formattedData = formatData(data);
+    public Item setCount(int count) {
+        this.count = count;
         return this;
     }
-
-    // Method for formatting data if needed
-    /*
-    private String formatData(String data) {
-        // Example of data processing
-        return data.trim();
-    }
-
-    public String getFormattedData() {
-        return formattedData;
-    }
-     */
 }

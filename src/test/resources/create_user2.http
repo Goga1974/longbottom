@@ -1,0 +1,24 @@
+
+### Create User
+POST http://localhost:8074/api/create
+Content-Type: application/json
+
+{
+  "userId": "128",
+  "userName": "John Jentos",
+  "items": [
+      {
+        "itemId": "item1",
+        "count": 1
+      },
+    {
+      "itemId": "item2",
+      "count": 2
+    }
+  ],
+  "unlocked": [
+    {
+      "itemId": "item1"
+    }
+  ]
+}

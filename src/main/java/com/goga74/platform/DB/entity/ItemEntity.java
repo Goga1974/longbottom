@@ -4,54 +4,60 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "item")
-public class ItemEntity
-{
+public class ItemEntity {
+
     @Id
-    @Column(name = "item_id", nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private Long id;
+
+    @Column(name = "item_id")
     private String itemId;
 
-    @Column(name = "item_name", nullable = false, unique = true)
-    private String itemName;
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
-    @Column(name = "data", columnDefinition = "JSON", nullable = false)
-    private String data;
+    @Column(name = "count", columnDefinition = "INT UNSIGNED DEFAULT 0")
+    private int count;
 
     public ItemEntity() {}
 
-    public ItemEntity(String itemId, String itemName, String data) {
+    public ItemEntity(String itemId, String userId, int count) {
         this.itemId = itemId;
-        this.itemName = itemName;
-        this.data = data;
+        this.userId = userId;
+        this.count = count;
     }
 
-    public String getItemId()
-    {
+    public Long getId() {
+        return id;
+    }
+
+    // Удалите setId, если не планируете вручную устанавливать ID
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getItemId() {
         return itemId;
     }
 
-    public void setItemId(String itemId)
-    {
+    public void setItemId(String itemId) {
         this.itemId = itemId;
     }
 
-    public String getItemName()
-    {
-        return itemName;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setItemName(String itemName)
-    {
-        this.itemName = itemName;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public String getData()
-    {
-        return data;
+    public int getCount() {
+        return count;
     }
 
-    public void setData(String data)
-    {
-        this.data = data;
+    public void setCount(int count) {
+        this.count = count;
     }
-
 }

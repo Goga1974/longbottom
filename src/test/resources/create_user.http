@@ -3,12 +3,12 @@ POST http://localhost:8074/api/create
 Content-Type: application/json
 
 {
-  "userId": "123",
-  "userName": "John Doe",
+  "userId": "124",
+  "userName": "John Dow",
   "items": [
     {
-      "itemId": "item1",
-      "itemName": "Item One"
+      "itemId": "item2",
+      "itemName": "Item Two"
     }
   ]
 }
