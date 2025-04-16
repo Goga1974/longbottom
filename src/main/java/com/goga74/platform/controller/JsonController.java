@@ -36,15 +36,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RequestMapping("/api")
 public class JsonController
 {
-    //private final DataRepository dataRepository;
-
-    //public JsonController(DataRepository dataRepository)
-    /*
-    {
-        this.dataRepository = dataRepository;
-    }
-     */
-
     private final DataService dataService;
     private final DataRepository dataRepository;
     private final ItemRepository itemRepository;
@@ -129,6 +120,32 @@ public class JsonController
     }
 
     @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginRequest request)
+    {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success"); // По умолчанию статус успешный
+
+        if (request != null && request.getUserId() != null)
+        {
+            String userId = request.getUserId();
+            Map<String, Object> userData = dataService.getUser(userId);
+
+            if (userData.containsKey("ERROR_MESSAGE"))
+            {
+                response.put("ERROR_MESSAGE", userData.get("ERROR_MESSAGE"));
+                return ResponseEntity.ok(response); // Возвращаем статус 200 с сообщением об ошибке
+            }
+
+            response.putAll(userData); // Добавляем данные пользователя в ответ
+            return ResponseEntity.ok(response);
+        }
+
+        response.put("ERROR_MESSAGE", "userId is null"); // Если userId равен null, тоже добавляем сообщение
+        return ResponseEntity.ok(response); // Возвращаем статус 200 с сообщением об ошибке
+    }
+
+    /*
+    @PostMapping("/login")
     public CommonResponse loginUser(@RequestBody LoginRequest request)
     {
         if (request != null)
@@ -159,6 +176,7 @@ public class JsonController
             .setStatus("error")
             .setMessage("userId is null");
     }
+    */
 
     @Operation(summary = "Get user data by user ID",
             description = "Retrieve detailed user information along with associated items by user ID.")

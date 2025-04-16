@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "unlocked")
 public class UnlockedEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)

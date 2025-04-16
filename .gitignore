@@ -2,6 +2,7 @@
 *.iml
 *.iws
 *.log
+*.tar
 .classpath
 .project
 .settings/
