@@ -12,7 +12,6 @@ import com.goga74.platform.DB.service.DataService;
 import com.goga74.platform.controller.dto.*;
 import com.goga74.platform.util.JsonUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +28,6 @@ import com.google.gson.reflect.TypeToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/api")
@@ -144,70 +141,25 @@ public class JsonController
         return ResponseEntity.ok(response); // Возвращаем статус 200 с сообщением об ошибке
     }
 
-    /*
-    @PostMapping("/login")
-    public CommonResponse loginUser(@RequestBody LoginRequest request)
-    {
-        if (request != null)
-        {
-            final String userId = request.getUserId();
-            Optional<UserEntity> userOptional = dataRepository.findById(userId);
-            if (userOptional.isEmpty())
-            {
-                return new CommonResponse()
-                        .setStatus("error")
-                        .setMessage("User not found")
-                        .setUserId(request.getUserId());
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Map<String, Object>> getUser(@PathVariable String userId) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success"); // По умолчанию статус успешный
+
+        if (userId != null) {
+            Map<String, Object> userData = dataService.getUser(userId);
+
+            if (userData.containsKey("ERROR_MESSAGE")) {
+                response.put("ERROR_MESSAGE", userData.get("ERROR_MESSAGE"));
+                return ResponseEntity.ok(response); // Возвращаем статус 200 с сообщением об ошибке
             }
 
-            UserEntity user = userOptional.get();
-            // Using TypeToken to specify the exact type
-            Type itemListType = new TypeToken<List<ItemEntity>>() {}.getType();
-            List<Item> items = JsonUtil.convertFromJson(user.getData(), itemListType);
-
-            return new CommonResponse()
-                    .setStatus("success")
-                    .setUserId(userId)
-                    .setUserName(user.getUserName())
-                    .setItems(items)
-                    .setMessage("User data retrieved successfully");
+            response.putAll(userData); // Добавляем данные пользователя в ответ
+            return ResponseEntity.ok(response);
         }
-        return new CommonResponse()
-            .setStatus("error")
-            .setMessage("userId is null");
-    }
-    */
 
-    @Operation(summary = "Get user data by user ID",
-            description = "Retrieve detailed user information along with associated items by user ID.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successful retrieval of user data",
-                content = @Content(mediaType = "application/json",
-                schema = @Schema(implementation = CommonResponse.class))),
-        @ApiResponse(responseCode = "404", description = "User not found",
-                content = @Content(mediaType = "application/json"))
-    })
-    @GetMapping("/user/{userId}")
-    public CommonResponse getUserById(@PathVariable String userId)
-    {
-        Optional<UserEntity> userOptional = dataRepository.findById(userId);
-        if (userOptional.isEmpty())
-        {
-            return new CommonResponse()
-                    .setStatus("error")
-                    .setMessage("User not found")
-                    .setUserId(userId);
-        }
-        UserEntity user = userOptional.get();
-        // Using TypeToken to specify the exact type
-        Type itemListType = new TypeToken<List<Item>>() {}.getType();
-        List<Item> items = JsonUtil.convertFromJson(user.getData(), itemListType);
-        return new CommonResponse()
-                .setStatus("success")
-                .setUserId(userId)
-                .setUserName(user.getUserName())
-                .setItems(items)
-                .setMessage("User data retrieved successfully");
+        response.put("ERROR_MESSAGE", "userId is null"); // Если userId равен null, тоже добавляем сообщение
+        return ResponseEntity.ok(response); // Возвращаем статус 200 с сообщением об ошибке
     }
 
     @Operation(summary = "Update user data", description = "Update the data of a user.")
