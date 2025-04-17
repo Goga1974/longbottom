@@ -1,0 +1,18 @@
+cd C:\srdev\longbottom\
+docker build -t jback-do .
+docker images
+docker save jback-do:latest -o jback-do.tar
+scp -i C:\DigitalOcean\key2\key2_do C:\srdev\longbottom\jback-do.tar user@__IP__:/user
+
+SSH
+ls -la
+tar -xvf jback-do.tar
+docker load -i ./jback-do.tar
+docker images
+docker run -d --name jb_cont -p 80:80 jback-do
+docker ps
+sudo docker logs -f jb_cont
+sudo docker stop jb_cont
+sudo docker rm jb_cont
+sudo docker rmi jback-do:latest
+rm jback-do.tar

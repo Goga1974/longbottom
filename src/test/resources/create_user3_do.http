@@ -1,0 +1,24 @@
+
+### Create User
+POST http://134.199.189.35/api/create
+Content-Type: application/json
+
+{
+  "userId": "121",
+  "userName": "John Jentos",
+  "items": [
+    {
+      "itemId": "item1",
+      "count": 1
+    },
+    {
+      "itemId": "item2",
+      "count": 2
+    }
+  ],
+  "unlocked": [
+    {
+      "itemId": "item1"
+    }
+  ]
+}
