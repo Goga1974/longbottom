@@ -1,0 +1,7 @@
+### Login User
+POST http://134.199.189.35/api/login
+Content-Type: application/json
+
+{
+  "userId": "121"
+}

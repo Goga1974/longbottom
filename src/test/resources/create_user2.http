@@ -4,8 +4,8 @@ POST http://localhost:8074/api/create
 Content-Type: application/json
 
 {
-  "userId": "121",
-  "userName": "John Jentos",
+  "userId": "132",
+  "userName": "John Dantist2",
   "items": [
       {
         "itemId": "item1",

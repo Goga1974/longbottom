@@ -1,0 +1,18 @@
+### Handle Transaction
+POST http://134.199.189.35/api/login
+Content-Type: application/json
+
+{
+  "userId": "124",
+  "itemsDelete": [
+    {
+      "itemId": "item2"
+    }
+  ],
+  "itemsAdd": [
+    {
+      "itemId": "item3",
+      "itemName": "Item Three"
+    }
+  ]
+}

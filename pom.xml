@@ -6,10 +6,20 @@
     <artifactId>mobile-platform</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <jupiter.version>5.9.3</jupiter.version>
+        <spring.boot.version>3.1.12</spring.boot.version>
+        <jwt.version>0.11.5</jwt.version>
+        <log4j.version>2.20.0</log4j.version>
+    </properties>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.2</version>
+        <version>3.1.12</version>
         <relativePath/>
     </parent>
 
@@ -20,15 +30,6 @@
             <url>https://maven.pkg.github.com/Goga1974/longbottom</url>
         </repository>
     </distributionManagement>
-
-    <properties>
-        <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <jupiter.version>5.9.3</jupiter.version>
-        <spring.boot.version>3.1.2</spring.boot.version>
-        <log4j.version>2.20.0</log4j.version>
-    </properties>
 
     <dependencies>
         <!-- Spring Boot Web Starter -->
@@ -130,6 +131,24 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if you prefer -->
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
     </dependencies>
