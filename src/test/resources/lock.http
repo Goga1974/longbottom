@@ -1,0 +1,8 @@
+### Lock item
+POST http://localhost:8074/api/lock
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMzEiLCJpYXQiOjE3NDUxNjQ3NTEsImV4cCI6MTc0NTI1MTE1MX0.H2Pn-2152gvcA2SfwAiaNiYgvJh5kNnCl4omVBxOOTA
+
+{
+  "userId": "131", "itemId": "item4"
+}

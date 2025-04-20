@@ -283,4 +283,66 @@ public class JsonController {
                 .setMessage("User not found");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
+
+    @PostMapping("/unlock")
+    public ResponseEntity<Map<String, Object>> unlockItem(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
+        final String userId = request.get("userId");
+        final String itemId = request.get("itemId");
+
+        if (userId == null || itemId == null) {
+            response.put("ERROR_MESSAGE", "userId or itemId is missing");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        dataService.deleteAllUnlockedByUserId(userId);
+
+        UnlockedEntity unlockedEntity = new UnlockedEntity();
+        unlockedEntity.setUserId(userId);
+        unlockedEntity.setItemId(itemId);
+        unlockedEntity.setCount(1);
+        unlockedRepository.save(unlockedEntity);
+        response.put("message", "Item unlocked successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/lock")
+    public ResponseEntity<Map<String, Object>> lockItem(@RequestHeader("Authorization") String token,
+                                                        @RequestBody Map<String, String> request)
+    {
+        Map<String, Object> response = new HashMap<>();
+        String userId = request.get("userId");
+        String itemId = request.get("itemId");
+
+        if (!isTokenValid(token, userId)) {
+            response.put("ERROR_MESSAGE", "Invalid or missing token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        if (userId == null || itemId == null) {
+            response.put("ERROR_MESSAGE", "userId or itemId is missing");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Optional<UnlockedEntity> unlockedEntityOptional = unlockedRepository.findByUserIdAndItemId(userId, itemId);
+        if (unlockedEntityOptional.isPresent()) {
+            unlockedRepository.delete(unlockedEntityOptional.get());
+            response.put("message", "Item locked successfully");
+        } else {
+            response.put("ERROR_MESSAGE", "Unlocked item not found");
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    private boolean isTokenValid(String token, String userId)
+    {
+        if (token == null || !token.startsWith("Bearer "))
+        {
+            return false;
+        }
+        token = token.substring(7);
+        return jwtUtil.validateToken(token, userId);
+    }
+
 }

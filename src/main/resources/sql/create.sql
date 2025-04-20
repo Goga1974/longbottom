@@ -17,7 +17,7 @@ CREATE TABLE `item` (
 CREATE TABLE `unlocked` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `item_id` VARCHAR(255),
-    `user_id` VARCHAR(255) NOT NULL,
+    `user_id` VARCHAR(255) NOT NULL UNIQUE,
     `count` INT DEFAULT 1,
     INDEX (`item_id`),
     INDEX (`user_id`)

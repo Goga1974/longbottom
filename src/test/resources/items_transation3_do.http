@@ -14,5 +14,10 @@ Content-Type: application/json
       "itemId": "item3",
       "itemName": "Item Three"
     }
+  ],
+  "unlocked": [
+    {
+      "itemId": "item1"
+    }
   ]
 }

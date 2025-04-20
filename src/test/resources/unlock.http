@@ -1,0 +1,7 @@
+### Unlock item
+POST http://localhost:8074/api/unlock
+Content-Type: application/json
+
+{
+  "userId": "131", "itemId": "item4"
+}

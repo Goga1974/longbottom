@@ -13,10 +13,10 @@ public class UnlockedEntity {
     @Column(name = "item_id")
     private String itemId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false, unique = true)
     private String userId;
 
-    @Column(name = "count", columnDefinition = "INT DEFAULT 0")
+    @Column(name = "count", columnDefinition = "INT DEFAULT 1")
     private int count;
 
     public UnlockedEntity() {}

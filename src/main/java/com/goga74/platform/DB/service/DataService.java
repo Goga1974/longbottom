@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class DataService {
 
@@ -114,5 +116,11 @@ public class DataService {
             return token;
         }
         return null;
+    }
+
+    @Transactional
+    public void deleteAllUnlockedByUserId(final String userId)
+    {
+        unlockedRepository.deleteByUserId(userId);
     }
 }
