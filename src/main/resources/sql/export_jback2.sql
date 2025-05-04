@@ -1,5 +1,4 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
 -- Версия сервера:               8.0.41 - MySQL Community Server - GPL
 -- Операционная система:         Win64
 -- HeidiSQL Версия:              12.10.0.7000
@@ -28,9 +27,7 @@ CREATE TABLE IF NOT EXISTS `item` (
   PRIMARY KEY (`id`),
   KEY `item_id` (`item_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Экспортируемые данные не выделены.
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп структуры для таблица jback.request_log
 CREATE TABLE IF NOT EXISTS `request_log` (
@@ -45,8 +42,6 @@ CREATE TABLE IF NOT EXISTS `request_log` (
   KEY `request_time` (`request_time`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Экспортируемые данные не выделены.
-
 -- Дамп структуры для таблица jback.unlocked
 CREATE TABLE IF NOT EXISTS `unlocked` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -58,8 +53,6 @@ CREATE TABLE IF NOT EXISTS `unlocked` (
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Экспортируемые данные не выделены.
-
 -- Дамп структуры для таблица jback.user
 CREATE TABLE IF NOT EXISTS `user` (
   `user_id` varchar(255) NOT NULL,
@@ -69,7 +62,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Экспортируемые данные не выделены.
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

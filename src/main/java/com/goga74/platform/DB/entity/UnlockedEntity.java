@@ -21,26 +21,31 @@ public class UnlockedEntity {
 
     public UnlockedEntity() {}
 
-    public UnlockedEntity(String itemId, String userId, int count) {
+    public UnlockedEntity(String itemId, String userId, int count)
+    {
         this.itemId = itemId;
         this.userId = userId;
         this.count = count;
     }
 
-    public Long getId() {
+    public Long getId()
+    {
         return id;
     }
 
     // Удалите setId, если не планируете вручную устанавливать ID
-    public void setId(Long id) {
+    public void setId(Long id)
+    {
         this.id = id;
     }
 
-    public String getItemId() {
+    public String getItemId()
+    {
         return itemId;
     }
 
-    public void setItemId(String itemId) {
+    public void setItemId(String itemId)
+    {
         this.itemId = itemId;
     }
 
@@ -48,15 +53,18 @@ public class UnlockedEntity {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(String userId)
+    {
         this.userId = userId;
     }
 
-    public int getCount() {
+    public int getCount()
+    {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(int count)
+    {
         this.count = count;
     }
 }

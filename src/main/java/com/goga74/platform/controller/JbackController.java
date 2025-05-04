@@ -1,13 +1,7 @@
 package com.goga74.platform.controller;
 
-import com.goga74.platform.DB.entity.RequestLog;
-import com.goga74.platform.DB.entity.UnlockedEntity;
-import com.goga74.platform.DB.entity.UserEntity;
-import com.goga74.platform.DB.entity.ItemEntity;
-import com.goga74.platform.DB.repository.DataRepository;
-import com.goga74.platform.DB.repository.ItemRepository;
-import com.goga74.platform.DB.repository.RequestLogRepository;
-import com.goga74.platform.DB.repository.UnlockedRepository;
+import com.goga74.platform.DB.entity.*;
+import com.goga74.platform.DB.repository.*;
 import com.goga74.platform.DB.service.DataService;
 import com.goga74.platform.controller.dto.*;
 import com.goga74.platform.controller.dto.request.CreateRequest;
@@ -42,6 +36,7 @@ public class JbackController {
     private final ItemRepository itemRepository;
     private final RequestLogRepository requestLogRepository;
     private final UnlockedRepository unlockedRepository;
+    private final InstallRepository installRepository;
     private final JWTUtil jwtUtil; // Добавляем JwtUtil
 
     @Value("${request.limit.minutes}")
@@ -52,83 +47,38 @@ public class JbackController {
                            ItemRepository itemRepository,
                            RequestLogRepository requestLogRepository,
                            UnlockedRepository unlockedRepository,
-                           JWTUtil jwtUtil) { // Добавляем в конструктор
+                           InstallRepository installRepository,
+                           JWTUtil jwtUtil) {
         this.dataService = dataService;
         this.dataRepository = dataRepository;
         this.itemRepository = itemRepository;
         this.requestLogRepository = requestLogRepository;
         this.unlockedRepository = unlockedRepository;
+        this.installRepository = installRepository;
         this.jwtUtil = jwtUtil; // Инициализируем jwtUtil
     }
-
-    /*
-    @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createUser(@RequestBody CreateRequest request, HttpServletRequest httpRequest) {
-        Map<String, Object> response = new HashMap<>();
-
-        // Получение IP и User-Agent из HttpServletRequest
-        String ipAddress = httpRequest.getRemoteAddr();
-        String userAgent = httpRequest.getHeader("User-Agent");
-
-        // Запись в таблицу request_log
-        RequestLog requestLog = new RequestLog();
-        requestLog.setUserId(request.getUserId());
-        requestLog.setIpAddress(ipAddress);
-        requestLog.setUserAgent(userAgent);
-
-        // Получение текущего времени в GMT
-        ZonedDateTime gmtTime = ZonedDateTime.now(ZoneId.of("GMT"));
-        LocalDateTime gmtLocalDateTime = gmtTime.toLocalDateTime();
-        requestLog.setRequestTime(gmtLocalDateTime);
-        requestLogRepository.save(requestLog);
-
-        // Остальная логика создания пользователя
-        try {
-            Optional<UserEntity> existingUser = dataRepository.findById(request.getUserId());
-            if (existingUser.isEmpty()) {
-                UserEntity user = new UserEntity();
-                user.setUserId(request.getUserId());
-                user.setUserName(request.getUserName());
-                dataRepository.save(user);
-
-                List<ItemEntity> items = request.getItems().stream()
-                        .map(item -> {
-                            ItemEntity itemEntity = new ItemEntity();
-                            itemEntity.setItemId(item.getItemId());
-                            itemEntity.setUserId(request.getUserId());
-                            itemEntity.setCount(item.getCount());
-                            return itemEntity;
-                        })
-                        .toList();
-
-                //dataService.saveItems(items);
-                itemRepository.saveAll(items);
-
-                // Сохранение в таблицу unlocked
-                if (!request.getUnlocked().isEmpty()) {
-                    UnlockedEntity unlockedEntity = new UnlockedEntity();
-                    unlockedEntity.setItemId(request.getUnlocked().get(0).getItemId());
-                    unlockedEntity.setUserId(request.getUserId());
-                    unlockedEntity.setCount(1);
-                    unlockedRepository.save(unlockedEntity);
-                }
-
-                response.put("message", "User and items created successfully");
-            } else {
-                response.put("ERROR_MESSAGE", "User already exists");
-            }
-        } catch (Exception e) {
-            response.put("ERROR_MESSAGE", "An error occurred: " + e.getMessage());
-        }
-
-        return ResponseEntity.ok(response);
-    }
-    */
 
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createUser(@RequestBody CreateRequest request, HttpServletRequest httpRequest)
     {
         Map<String, Object> response = new HashMap<>();
+        if (request == null)
+        {
+            response.put("ERROR_MESSAGE", "request is null");
+            return ResponseEntity.ok(response);
+        }
+        final String userId = request.getUserId();
+        if (userId == null)
+        {
+            response.put("ERROR_MESSAGE", "userId is null");
+            return ResponseEntity.ok(response);
+        }
+        final String installId = request.getUserId();
+        final String pin = request.getPin();
+        if (pin == null) // create
+        {
+
+        }
 
         // Получение IP и User-Agent из HttpServletRequest
         final String ipAddress = httpRequest.getRemoteAddr();
@@ -154,10 +104,24 @@ public class JbackController {
         // Остальная логика создания пользователя
         try
         {
+            List<InstallEntity> installList = installRepository.findByUserId(userId);
+            if (installList.isEmpty()) // no install records
+            {
+
+            }
+            if (installList.size() == 1) // only one record
+            {
+
+            }
+            else
+            {
+                // ToDO: logic with multiply install records
+            }
+
             Optional<UserEntity> existingUser = dataRepository.findById(request.getUserId());
             if (existingUser.isEmpty()) {
                 UserEntity user = new UserEntity();
-                user.setUserId(request.getUserId());
+                user.setUserId(userId);
                 user.setUserName(request.getUserName());
                 dataRepository.save(user);
 
@@ -192,7 +156,6 @@ public class JbackController {
         } catch (Exception e) {
             response.put("ERROR_MESSAGE", "An error occurred: " + e.getMessage());
         }
-
         return ResponseEntity.ok(response);
     }
 
@@ -202,7 +165,7 @@ public class JbackController {
         response.put("status", "success");
 
         if (request != null && request.getUserId() != null) {
-            String userId = request.getUserId();
+            final String userId = request.getUserId();
             Map<String, Object> userData = dataService.getUser(userId);
 
             if (userData.containsKey("ERROR_MESSAGE")) {
@@ -247,10 +210,22 @@ public class JbackController {
     }
 
     @PostMapping("/transaction")
-    public ResponseEntity<JbackCommonResponse> handleTransaction(@RequestBody TransactionRequest request) {
+    public ResponseEntity<JbackCommonResponse> handleTransaction(@RequestBody TransactionRequest request)
+    {
         Optional<UserEntity> userOptional = dataRepository.findById(request.getUserId());
-        if (userOptional.isPresent()) {
+
+        if (userOptional.isPresent())
+        {
             UserEntity user = userOptional.get();
+
+            // Здесь может быть проверка pin, если это требуется
+            // if (!user.getPin().equals(request.getPin()))
+            // {
+            //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).
+            //              body(new JbackCommonResponse().
+            //                  setStatus("FAILURE").setMessage("Invalid PIN"));
+            // }
+
             Type itemListType = new TypeToken<List<Item>>() {}.getType();
             List<Item> currentItems = JsonUtil.convertFromJson(user.getData(), itemListType);
 
@@ -262,7 +237,8 @@ public class JbackController {
                     .map(Item::getItemId)
                     .collect(Collectors.toSet());
 
-            if (!currentItemIds.containsAll(itemsDeleteIds)) {
+            if (!currentItemIds.containsAll(itemsDeleteIds))
+            {
                 JbackCommonResponse response = new JbackCommonResponse()
                         .setStatus("FAILURE")
                         .setMessage("Some items to delete are not present");
@@ -271,6 +247,13 @@ public class JbackController {
 
             currentItems.removeIf(item -> itemsDeleteIds.contains(item.getItemId()));
             currentItems.addAll(request.getItemsAdd());
+
+            // Вызов метода saveUnlocked для обработки списка unlock
+            final String unlockResults = dataService.saveUnlocked(user.getUserId(), request.getItemsUnlock());
+            if (!unlockResults.isEmpty())
+            {
+                // ToDo: set message
+            }
 
             user.setData(JsonUtil.convertToJsonItems(currentItems));
             dataRepository.save(user);
@@ -283,6 +266,7 @@ public class JbackController {
             response.setItems(currentItems);
             return ResponseEntity.ok(response);
         }
+
         JbackCommonResponse response = new JbackCommonResponse()
                 .setStatus("FAILURE")
                 .setMessage("User not found");
@@ -290,7 +274,8 @@ public class JbackController {
     }
 
     @PostMapping("/unlock")
-    public ResponseEntity<Map<String, Object>> unlockItem(@RequestBody UnlockRequest request) {
+    public ResponseEntity<Map<String, Object>> unlockItem(@RequestBody UnlockRequest request)
+    {
         Map<String, Object> response = new HashMap<>();
         final String userId = request.getUserId();
         final Item itemUnlock = request.getItemUnlock();
@@ -301,10 +286,14 @@ public class JbackController {
         }
 
         List<Item> itemsToDelete = request.getItemsDelete();
-        if (itemsToDelete != null && !itemsToDelete.isEmpty()) {
-            for (Item item : itemsToDelete) {
-                Optional<UnlockedEntity> unlockedEntityOptional = unlockedRepository.findByUserIdAndItemId(userId, item.getItemId());
-                if (unlockedEntityOptional.isPresent()) {
+        if (itemsToDelete != null && !itemsToDelete.isEmpty())
+        {
+            for (Item item : itemsToDelete)
+            {
+                Optional<UnlockedEntity> unlockedEntityOptional = unlockedRepository.
+                        findByUserIdAndItemId(userId, item.getItemId());
+                if (unlockedEntityOptional.isPresent())
+                {
                     unlockedRepository.delete(unlockedEntityOptional.get());
                 }
             }
@@ -321,31 +310,6 @@ public class JbackController {
 
         return ResponseEntity.ok(response);
     }
-
-    /*
-    @PostMapping("/unlock")
-    public ResponseEntity<Map<String, Object>> unlockItem(@RequestBody Map<String, String> request) {
-        Map<String, Object> response = new HashMap<>();
-        final String userId = request.get("userId");
-        final String itemId = request.get("itemId");
-
-        if (userId == null || itemId == null) {
-            response.put("ERROR_MESSAGE", "userId or itemId is missing");
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        dataService.deleteAllUnlockedByUserId(userId);
-
-        UnlockedEntity unlockedEntity = new UnlockedEntity();
-        unlockedEntity.setUserId(userId);
-        unlockedEntity.setItemId(itemId);
-        unlockedEntity.setCount(1);
-        unlockedRepository.save(unlockedEntity);
-        response.put("message", "Item unlocked successfully");
-
-        return ResponseEntity.ok(response);
-    }
-    */
 
     @PostMapping("/lock")
     public ResponseEntity<Map<String, Object>> lockItem(@RequestHeader("Authorization") String token,

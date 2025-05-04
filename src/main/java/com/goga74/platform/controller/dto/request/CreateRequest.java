@@ -1,68 +1,102 @@
 package com.goga74.platform.controller.dto.request;
 
 import com.goga74.platform.controller.dto.Item;
+import com.google.gson.annotations.Expose;
 
 import java.util.List;
 
 public class CreateRequest {
+    @Expose
     private String userId;
+    @Expose
+    private String installId;
+    @Expose
     private String userName;
-    private String password; // New field for storing the password
+    @Expose
+    private String pin;
+    @Expose
     private List<Item> items;
-    private List<Unlock> unlocked; // New field for unlocked items
+    @Expose
+    private List<Unlock> unlocked;
 
     public CreateRequest() {}
 
-    public CreateRequest(String userId, String userName, String password, List<Item> items, List<Unlock> unlocked) {
+    public CreateRequest(final String userId, final String installId,
+                         final String userName, final String pin,
+                         List<Item> items, List<Unlock> unlocked)
+    {
         this.userId = userId;
+        this.installId = installId;
         this.userName = userName;
-        this.password = password;
+        this.pin = pin;
         this.items = items;
         this.unlocked = unlocked;
     }
 
-    public String getUserId() {
+    public String getUserId()
+    {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(final String userId)
+    {
         this.userId = userId;
     }
 
-    public String getUserName() {
+    public String getInstallId()
+    {
+        return installId;
+    }
+
+    public void setInstallId(final String installId)
+    {
+        this.installId = installId;
+    }
+
+    public String getUserName()
+    {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    public void setUserName(final String userName)
+    {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPin()
+    {
+        return pin;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPin(final String pin)
+    {
+        this.pin = pin;
     }
 
-    public List<Item> getItems() {
+    public List<Item> getItems()
+    {
         return items;
     }
 
-    public void setItems(List<Item> items) {
+    public void setItems(List<Item> items)
+    {
         this.items = items;
     }
 
-    public List<Unlock> getUnlocked() {
+    public List<Unlock> getUnlocked()
+    {
         return unlocked;
     }
 
-    public void setUnlocked(List<Unlock> unlocked) {
+    public void setUnlocked(List<Unlock> unlocked)
+    {
         this.unlocked = unlocked;
     }
 
+    // ToDo - modify because unlocked is a list
     // Inner class or separate class for Unlock
-    public static class Unlock {
+    public static class Unlock
+    {
         private String itemId;
 
         public Unlock() {}

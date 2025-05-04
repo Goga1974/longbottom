@@ -5,11 +5,8 @@ import com.goga74.platform.DB.entity.TokenEntity;
 import com.goga74.platform.DB.entity.UnlockedEntity;
 import com.goga74.platform.DB.entity.UserEntity;
 import com.goga74.platform.DB.entity.RequestLog;
-import com.goga74.platform.DB.repository.DataRepository;
-import com.goga74.platform.DB.repository.ItemRepository;
-import com.goga74.platform.DB.repository.RequestLogRepository;
-import com.goga74.platform.DB.repository.TokenRepository;
-import com.goga74.platform.DB.repository.UnlockedRepository;
+import com.goga74.platform.DB.repository.*;
+import com.goga74.platform.controller.dto.Item;
 import com.goga74.platform.util.JWTUtil;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +28,7 @@ public class DataService {
     private final RequestLogRepository requestLogRepository;
     private final UnlockedRepository unlockedRepository;
     private final TokenRepository tokenRepository;
+    private final InstallRepository installRepository;
     private final JWTUtil jwtUtil;
 
     public DataService(DataRepository dataRepository,
@@ -38,12 +36,14 @@ public class DataService {
                        RequestLogRepository requestLogRepository,
                        UnlockedRepository unlockedRepository,
                        TokenRepository tokenRepository,
+                       InstallRepository installRepository,
                        JWTUtil jwtUtil) {
         this.dataRepository = dataRepository;
         this.itemRepository = itemRepository;
         this.requestLogRepository = requestLogRepository;
         this.unlockedRepository = unlockedRepository;
         this.tokenRepository = tokenRepository;
+        this.installRepository = installRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -116,6 +116,36 @@ public class DataService {
             return token;
         }
         return null;
+    }
+
+    @Transactional
+    public String saveUnlocked(final String userId, final List<Item> unlockItems)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (Item unlockItem : unlockItems)
+        {
+            final String itemId = unlockItem.getItemId();
+            Optional<UnlockedEntity> unlockedEntityOptional = unlockedRepository
+                    .findByUserIdAndItemId(userId, itemId);
+
+            if (unlockedEntityOptional.isPresent())
+            {
+                // Record already exists
+                // ToDO: handle?
+                if (!sb.isEmpty())
+                {
+                    sb.append("; ");
+                }
+                //noinspection MalformedFormatString
+                sb.append(
+                        String.format("Item %s for user %s already unlocked %s", itemId, userId));
+            } else {
+                // record not found
+                UnlockedEntity newUnlockedEntity = new UnlockedEntity(itemId, userId, 1);
+                unlockedRepository.save(newUnlockedEntity);
+            }
+        }
+        return sb.toString();
     }
 
     @Transactional

@@ -9,7 +9,7 @@ public class LoginRequest
     @Expose
     private String username; // Corresponds to `user_name` in the table
     @Expose
-    private String password; // Corresponds to `pass` in the table
+    private String pin; // Corresponds to `pin` in the table
 
     public String getUserId() {
         return userId;
@@ -29,12 +29,12 @@ public class LoginRequest
         return this;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPin() {
+        return this.pin;
     }
 
-    public LoginRequest setPassword(String password) {
-        this.password = password;
+    public LoginRequest setPin(String password) {
+        this.pin = password;
         return this;
     }
 }

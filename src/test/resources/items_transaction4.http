@@ -1,0 +1,25 @@
+### Handle Transaction
+POST http://localhost:80/api/login
+Content-Type: application/json
+
+{
+  "userId": "124",
+  "installId": "1t4yJKpo21sA",
+  "pin": "1234",
+  "itemsDelete": [
+    {
+      "itemId": "item2"
+    }
+  ],
+  "itemsAdd": [
+    {
+      "itemId": "item3",
+      "itemName": "Item Three"
+    }
+  ],
+  "unlocked": [
+    {
+      "itemId": "item1"
+    }
+  ]
+}

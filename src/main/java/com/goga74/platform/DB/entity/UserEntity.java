@@ -13,6 +13,9 @@ public class UserEntity
     @Column(name = "user_name")
     private String userName;
 
+    @Column(name = "pin")
+    private String pin;
+
     @Column(name = "data", columnDefinition = "JSON")
     private String data;
 
