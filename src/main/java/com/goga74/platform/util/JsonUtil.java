@@ -2,6 +2,7 @@ package com.goga74.platform.util;
 
 import com.goga74.platform.DB.entity.ItemEntity;
 import com.goga74.platform.controller.dto.Item;
+import com.goga74.platform.controller.dto.PriceEntry;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.List;
@@ -14,9 +15,14 @@ public class JsonUtil
             .excludeFieldsWithoutExposeAnnotation()
             .create();
 
-    public static String convertToJson(List<Item> items)
+    public static String convertToJsonItems(List<Item> items)
     {
         return gson.toJson(items);
+    }
+
+    public static String convertToJsonEntries(List<PriceEntry> priceEntries)
+    {
+        return gson.toJson(priceEntries);
     }
 
     public static List<ItemEntity> convertFromJson(String json)

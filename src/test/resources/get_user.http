@@ -1,2 +1,2 @@
 ### Get User by ID
-GET http://localhost:8074/api/user/121
+GET http://localhost:80/api/user/121

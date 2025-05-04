@@ -1,0 +1,9 @@
+CREATE TABLE `requests` (
+    request_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    url VARCHAR(512) NOT NULL UNIQUE,
+    request_time DATETIME NOT NULL,
+    crc BIGINT NOT NULL,
+    title VARCHAR(255),
+    size BIGINT NOT NULL,
+    content LONGTEXT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;

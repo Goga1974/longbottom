@@ -1,8 +1,6 @@
-package com.goga74.platform.controller.dto;
+package com.goga74.platform.controller.dto.response;
 
-import java.util.List;
-
-public class ApiResponse {
+public class JbackApiResponse {
 	private Data data;
 	
 	public Data getData() {

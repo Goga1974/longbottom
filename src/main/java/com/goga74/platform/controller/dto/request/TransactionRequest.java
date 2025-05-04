@@ -1,4 +1,6 @@
-package com.goga74.platform.controller.dto;
+package com.goga74.platform.controller.dto.request;
+
+import com.goga74.platform.controller.dto.Item;
 
 import java.util.Collection;
 import java.util.List;

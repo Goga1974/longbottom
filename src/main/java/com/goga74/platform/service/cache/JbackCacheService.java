@@ -6,14 +6,14 @@ import java.util.Map;
 
 import com.goga74.platform.controller.dto.User;
 
-public class CacheService
+public class JbackCacheService
 {
 
     private final int cacheExpirationInSeconds; // Cache expiration time in seconds
     private final Map<String, CacheEntry> cacheMap; // Map to store user cache
 
     // Constructor with cache expiration parameter
-    public CacheService(int cacheExpirationInSeconds)
+    public JbackCacheService(int cacheExpirationInSeconds)
     {
         this.cacheExpirationInSeconds = cacheExpirationInSeconds;
         this.cacheMap = new HashMap<>();

@@ -1,5 +1,5 @@
 ### Unlock item
-POST http://localhost:8074/api/unlock
+POST http://localhost:80/api/unlock
 Content-Type: application/json
 
 {

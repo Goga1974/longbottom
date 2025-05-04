@@ -1,6 +1,6 @@
 
 ### Create User
-POST http://localhost:8074/api/create
+POST http://localhost:80/api/create
 Content-Type: application/json
 
 {

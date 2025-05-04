@@ -1,5 +1,5 @@
 ### Login User
-POST http://localhost:8074/api/login
+POST http://localhost:80/api/login
 Content-Type: application/json
 
 {

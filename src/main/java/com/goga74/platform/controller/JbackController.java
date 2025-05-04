@@ -10,6 +10,11 @@ import com.goga74.platform.DB.repository.RequestLogRepository;
 import com.goga74.platform.DB.repository.UnlockedRepository;
 import com.goga74.platform.DB.service.DataService;
 import com.goga74.platform.controller.dto.*;
+import com.goga74.platform.controller.dto.request.CreateRequest;
+import com.goga74.platform.controller.dto.request.LoginRequest;
+import com.goga74.platform.controller.dto.request.TransactionRequest;
+import com.goga74.platform.controller.dto.request.UnlockRequest;
+import com.goga74.platform.controller.dto.response.JbackCommonResponse;
 import com.goga74.platform.util.JsonUtil;
 import com.goga74.platform.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +35,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 @RequestMapping("/api")
-public class JsonController {
+public class JbackController {
 
     private final DataService dataService;
     private final DataRepository dataRepository;
@@ -42,12 +47,12 @@ public class JsonController {
     @Value("${request.limit.minutes}")
     private int requestLimitMinutes;
 
-    public JsonController(DataService dataService,
-                          DataRepository dataRepository,
-                          ItemRepository itemRepository,
-                          RequestLogRepository requestLogRepository,
-                          UnlockedRepository unlockedRepository,
-                          JWTUtil jwtUtil) { // Добавляем в конструктор
+    public JbackController(DataService dataService,
+                           DataRepository dataRepository,
+                           ItemRepository itemRepository,
+                           RequestLogRepository requestLogRepository,
+                           UnlockedRepository unlockedRepository,
+                           JWTUtil jwtUtil) { // Добавляем в конструктор
         this.dataService = dataService;
         this.dataRepository = dataRepository;
         this.itemRepository = itemRepository;
@@ -242,7 +247,7 @@ public class JsonController {
     }
 
     @PostMapping("/transaction")
-    public ResponseEntity<CommonResponse> handleTransaction(@RequestBody TransactionRequest request) {
+    public ResponseEntity<JbackCommonResponse> handleTransaction(@RequestBody TransactionRequest request) {
         Optional<UserEntity> userOptional = dataRepository.findById(request.getUserId());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
@@ -258,7 +263,7 @@ public class JsonController {
                     .collect(Collectors.toSet());
 
             if (!currentItemIds.containsAll(itemsDeleteIds)) {
-                CommonResponse response = new CommonResponse()
+                JbackCommonResponse response = new JbackCommonResponse()
                         .setStatus("FAILURE")
                         .setMessage("Some items to delete are not present");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -267,10 +272,10 @@ public class JsonController {
             currentItems.removeIf(item -> itemsDeleteIds.contains(item.getItemId()));
             currentItems.addAll(request.getItemsAdd());
 
-            user.setData(JsonUtil.convertToJson(currentItems));
+            user.setData(JsonUtil.convertToJsonItems(currentItems));
             dataRepository.save(user);
 
-            CommonResponse response = new CommonResponse()
+            JbackCommonResponse response = new JbackCommonResponse()
                     .setStatus("SUCCESS")
                     .setMessage("Items managed successfully");
             response.setUserId(user.getUserId());
@@ -278,12 +283,46 @@ public class JsonController {
             response.setItems(currentItems);
             return ResponseEntity.ok(response);
         }
-        CommonResponse response = new CommonResponse()
+        JbackCommonResponse response = new JbackCommonResponse()
                 .setStatus("FAILURE")
                 .setMessage("User not found");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
+    @PostMapping("/unlock")
+    public ResponseEntity<Map<String, Object>> unlockItem(@RequestBody UnlockRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        final String userId = request.getUserId();
+        final Item itemUnlock = request.getItemUnlock();
+
+        if (userId == null || itemUnlock == null || itemUnlock.getItemId() == null) {
+            response.put("ERROR_MESSAGE", "userId or itemUnlock is missing");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        List<Item> itemsToDelete = request.getItemsDelete();
+        if (itemsToDelete != null && !itemsToDelete.isEmpty()) {
+            for (Item item : itemsToDelete) {
+                Optional<UnlockedEntity> unlockedEntityOptional = unlockedRepository.findByUserIdAndItemId(userId, item.getItemId());
+                if (unlockedEntityOptional.isPresent()) {
+                    unlockedRepository.delete(unlockedEntityOptional.get());
+                }
+            }
+        }
+
+        // dataService.deleteAllUnlockedByUserId(userId);
+
+        UnlockedEntity unlockedEntity = new UnlockedEntity();
+        unlockedEntity.setUserId(userId);
+        unlockedEntity.setItemId(itemUnlock.getItemId());
+        unlockedEntity.setCount(1);
+        unlockedRepository.save(unlockedEntity);
+        response.put("message", "Item unlocked successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
+    /*
     @PostMapping("/unlock")
     public ResponseEntity<Map<String, Object>> unlockItem(@RequestBody Map<String, String> request) {
         Map<String, Object> response = new HashMap<>();
@@ -306,6 +345,7 @@ public class JsonController {
 
         return ResponseEntity.ok(response);
     }
+    */
 
     @PostMapping("/lock")
     public ResponseEntity<Map<String, Object>> lockItem(@RequestHeader("Authorization") String token,

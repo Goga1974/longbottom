@@ -1,9 +1,10 @@
-package com.goga74.platform.controller.dto;
+package com.goga74.platform.controller.dto.response;
 
+import com.goga74.platform.controller.dto.Item;
 import com.google.gson.annotations.Expose;
 import java.util.List;
 
-public class CommonResponse
+public class JbackCommonResponse
 {
     @Expose
     private String status;
@@ -23,7 +24,7 @@ public class CommonResponse
         return status;
     }
 
-    public CommonResponse setStatus(String status)
+    public JbackCommonResponse setStatus(String status)
     {
         this.status = status;
         return this;
@@ -34,7 +35,7 @@ public class CommonResponse
         return message;
     }
 
-    public CommonResponse setMessage(String message)
+    public JbackCommonResponse setMessage(String message)
     {
         this.message = message;
         return this;
@@ -58,7 +59,7 @@ public class CommonResponse
         return userId;
     }
 
-    public CommonResponse setUserId(String userId)
+    public JbackCommonResponse setUserId(String userId)
     {
         this.userId = userId;
         return this;
@@ -69,7 +70,7 @@ public class CommonResponse
         return userName;
     }
 
-    public CommonResponse setUserName(String userName)
+    public JbackCommonResponse setUserName(String userName)
     {
         this.userName = userName;
         return this;
@@ -80,7 +81,7 @@ public class CommonResponse
         return items;
     }
 
-    public CommonResponse setItems(List<Item> items)
+    public JbackCommonResponse setItems(List<Item> items)
     {
         this.items = items;
         return this;

@@ -1,5 +1,5 @@
 ### Update User Data
-POST http://localhost:8074/api/update
+POST http://localhost:80/api/update
 Content-Type: application/json
 
 {

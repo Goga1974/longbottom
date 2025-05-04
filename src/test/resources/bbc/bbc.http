@@ -1,0 +1,7 @@
+### Parse BBC Page
+POST http://localhost:8074/api/parse
+Content-Type: application/json
+
+{
+  "url": "http://bbc.com"
+}
