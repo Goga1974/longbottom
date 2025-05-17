@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "unlocked")
+@Table(name = "install")
 public class InstallEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

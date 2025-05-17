@@ -87,6 +87,7 @@ public class JbackController {
         jbackDataService.logRequest(request.getUserId(), ipAddress, userAgent);
 
         // Проверка последнего запроса с этого IP
+        /*
         Optional<RequestLog> lastRequestOpt = jbackRequestLogRepository.
                 findFirstByIpAddressOrderByRequestTimeDesc(ipAddress);
         if (lastRequestOpt.isPresent())
@@ -102,6 +103,7 @@ public class JbackController {
                 return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(response);
             }
         }
+        */
 
         try
         {
@@ -131,6 +133,9 @@ public class JbackController {
                 InstallEntity install = new InstallEntity();
                 install.setInstallId(installId);
                 install.setUserId(userId);
+                ZonedDateTime gmtTime = ZonedDateTime.now(ZoneId.of("GMT"));
+                LocalDateTime gmtLocalDateTime = gmtTime.toLocalDateTime();
+                install.setRequestTime(gmtLocalDateTime);
                 jbackInstallRepository.save(install);
             }
             if (installList.size() == 1) // only one record
