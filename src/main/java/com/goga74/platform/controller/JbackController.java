@@ -1,14 +1,15 @@
 package com.goga74.platform.controller;
 
-import com.goga74.platform.DB.entity.*;
+import com.goga74.platform.DB.entity.jback.*;
 import com.goga74.platform.DB.repository.*;
-import com.goga74.platform.DB.service.DataService;
-import com.goga74.platform.controller.dto.*;
-import com.goga74.platform.controller.dto.request.CreateRequest;
-import com.goga74.platform.controller.dto.request.LoginRequest;
-import com.goga74.platform.controller.dto.request.TransactionRequest;
-import com.goga74.platform.controller.dto.request.UnlockRequest;
-import com.goga74.platform.controller.dto.response.JbackCommonResponse;
+import com.goga74.platform.DB.dbservice.JbackDataService;
+import com.goga74.platform.controller.dto.jback.Item;
+import com.goga74.platform.controller.request.CreateRequest;
+import com.goga74.platform.controller.request.LoginRequest;
+import com.goga74.platform.controller.request.TransactionRequest;
+import com.goga74.platform.controller.request.UnlockRequest;
+import com.goga74.platform.controller.response.jback.JbackCommonResponse;
+import com.goga74.platform.service.PinService;
 import com.goga74.platform.util.JsonUtil;
 import com.goga74.platform.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,30 +32,30 @@ import org.springframework.beans.factory.annotation.Value;
 @RequestMapping("/api")
 public class JbackController {
 
-    private final DataService dataService;
-    private final DataRepository dataRepository;
-    private final ItemRepository itemRepository;
-    private final RequestLogRepository requestLogRepository;
-    private final UnlockedRepository unlockedRepository;
-    private final InstallRepository installRepository;
+    private final JbackDataService jbackDataService;
+    private final JbackDataRepository JBackDataRepository;
+    private final JbackItemRepository jbackItemRepository;
+    private final JbackRequestLogRepository jbackRequestLogRepository;
+    private final JbackUnlockedRepository jbackUnlockedRepository;
+    private final JbackInstallRepository jbackInstallRepository;
     private final JWTUtil jwtUtil; // Добавляем JwtUtil
 
     @Value("${request.limit.minutes}")
     private int requestLimitMinutes;
 
-    public JbackController(DataService dataService,
-                           DataRepository dataRepository,
-                           ItemRepository itemRepository,
-                           RequestLogRepository requestLogRepository,
-                           UnlockedRepository unlockedRepository,
-                           InstallRepository installRepository,
+    public JbackController(JbackDataService jbackDataService,
+                           JbackDataRepository JBackDataRepository,
+                           JbackItemRepository jbackItemRepository,
+                           JbackRequestLogRepository jbackRequestLogRepository,
+                           JbackUnlockedRepository jbackUnlockedRepository,
+                           JbackInstallRepository jbackInstallRepository,
                            JWTUtil jwtUtil) {
-        this.dataService = dataService;
-        this.dataRepository = dataRepository;
-        this.itemRepository = itemRepository;
-        this.requestLogRepository = requestLogRepository;
-        this.unlockedRepository = unlockedRepository;
-        this.installRepository = installRepository;
+        this.jbackDataService = jbackDataService;
+        this.JBackDataRepository = JBackDataRepository;
+        this.jbackItemRepository = jbackItemRepository;
+        this.jbackRequestLogRepository = jbackRequestLogRepository;
+        this.jbackUnlockedRepository = jbackUnlockedRepository;
+        this.jbackInstallRepository = jbackInstallRepository;
         this.jwtUtil = jwtUtil; // Инициализируем jwtUtil
     }
 
@@ -74,17 +75,19 @@ public class JbackController {
             return ResponseEntity.ok(response);
         }
         final String installId = request.getUserId();
-        final String pin = request.getPin();
-        if (pin == null) // create
+        String pin = request.getPin();
+        if (pin == null || pin.isEmpty()) // create pin
         {
 
         }
 
         // Получение IP и User-Agent из HttpServletRequest
         final String ipAddress = httpRequest.getRemoteAddr();
+        final String userAgent = httpRequest.getHeader("User-Agent");
+        jbackDataService.logRequest(request.getUserId(), ipAddress, userAgent);
 
         // Проверка последнего запроса с этого IP
-        Optional<RequestLog> lastRequestOpt = requestLogRepository.
+        Optional<RequestLog> lastRequestOpt = jbackRequestLogRepository.
                 findFirstByIpAddressOrderByRequestTimeDesc(ipAddress);
         if (lastRequestOpt.isPresent())
         {
@@ -100,63 +103,95 @@ public class JbackController {
             }
         }
 
-        final String userAgent = httpRequest.getHeader("User-Agent");
-        // Остальная логика создания пользователя
         try
         {
-            List<InstallEntity> installList = installRepository.findByUserId(userId);
-            if (installList.isEmpty()) // no install records
+            Optional<UserEntity> existingUser = JBackDataRepository.findById(request.getUserId());
+            if (existingUser.isEmpty())
             {
-
+                // new user
+                saveUser(request, response, PinService.generatePin(), true);
+            }
+            if (existingUser.isPresent())
+            {
+                UserEntity exUser = existingUser.get();
+                if (pin == null || pin.isEmpty() || !pin.equals(exUser.getPin()))
+                {
+                    response.put("ERROR_MESSAGE", "User already exists and pin does not match or pin is empty");
+                    return ResponseEntity.ok(response);
+                }
+                else
+                {
+                    // update user
+                    saveUser(request, response, exUser.getPin(), false);
+                }
+            }
+            List<InstallEntity> installList = jbackInstallRepository.findByUserId(userId);
+            if (installList.isEmpty())
+            {
+                InstallEntity install = new InstallEntity();
+                install.setInstallId(installId);
+                install.setUserId(userId);
+                jbackInstallRepository.save(install);
             }
             if (installList.size() == 1) // only one record
             {
-
-            }
-            else
-            {
-                // ToDO: logic with multiply install records
-            }
-
-            Optional<UserEntity> existingUser = dataRepository.findById(request.getUserId());
-            if (existingUser.isEmpty()) {
-                UserEntity user = new UserEntity();
-                user.setUserId(userId);
-                user.setUserName(request.getUserName());
-                dataRepository.save(user);
-
-                List<ItemEntity> items = request.getItems().stream()
-                        .map(item -> {
-                            ItemEntity itemEntity = new ItemEntity();
-                            itemEntity.setItemId(item.getItemId());
-                            itemEntity.setUserId(request.getUserId());
-                            itemEntity.setCount(item.getCount());
-                            return itemEntity;
-                        })
-                        .toList();
-
-                //dataService.saveItems(items);
-                itemRepository.saveAll(items);
-
-                // Сохранение в таблицу unlocked
-                if (!request.getUnlocked().isEmpty())
+                final String install = installList.get(0).getInstallId();
+                if (install != null && !install.isEmpty() && !install.equals(installId))
                 {
-                    UnlockedEntity unlockedEntity = new UnlockedEntity();
-                    unlockedEntity.setItemId(request.getUnlocked().get(0).getItemId());
-                    unlockedEntity.setUserId(request.getUserId());
-                    unlockedEntity.setCount(1);
-                    unlockedRepository.save(unlockedEntity);
+                    response.put("ERROR_MESSAGE", "Install id does not match the request");
+                    return ResponseEntity.ok(response);
                 }
-
-                dataService.logRequest(request.getUserId(), ipAddress, userAgent);
-                response.put("message", "User and items created successfully");
-            } else {
-                response.put("ERROR_MESSAGE", "User already exists");
             }
+            if (installList.size() > 1)
+            {
+                // logic with multiply install records
+                response.put("ERROR_MESSAGE", "More than one install found");
+                return ResponseEntity.ok(response);
+            }
+
         } catch (Exception e) {
             response.put("ERROR_MESSAGE", "An error occurred: " + e.getMessage());
         }
         return ResponseEntity.ok(response);
+    }
+
+    private void saveUser(CreateRequest request, Map<String, Object> response, final String pin, final boolean isCreate)
+    {
+        UserEntity user = new UserEntity();
+        user.setUserId(request.getUserId());
+        user.setUserName(request.getUserName());
+        if (isCreate)
+        {
+            user.setPin(pin);
+        }
+
+        JBackDataRepository.save(user);
+        response.put("pin", user.getPin());
+
+        List<ItemEntity> items = request.getItems().stream()
+                .map(item -> {
+                    ItemEntity itemEntity = new ItemEntity();
+                    itemEntity.setItemId(item.getItemId());
+                    itemEntity.setUserId(request.getUserId());
+                    itemEntity.setCount(item.getCount());
+                    return itemEntity;
+                })
+                .toList();
+
+        //dataService.saveItems(items);
+        jbackItemRepository.saveAll(items);
+
+        // Сохранение в таблицу unlocked
+        if (!request.getUnlocked().isEmpty())
+        {
+            UnlockedEntity unlockedEntity = new UnlockedEntity();
+            unlockedEntity.setItemId(request.getUnlocked().get(0).getItemId());
+            unlockedEntity.setUserId(request.getUserId());
+            unlockedEntity.setCount(1);
+            jbackUnlockedRepository.save(unlockedEntity);
+        }
+
+        response.put("message", "User and items created successfully");
     }
 
     @PostMapping("/login")
@@ -166,7 +201,7 @@ public class JbackController {
 
         if (request != null && request.getUserId() != null) {
             final String userId = request.getUserId();
-            Map<String, Object> userData = dataService.getUser(userId);
+            Map<String, Object> userData = jbackDataService.getUser(userId);
 
             if (userData.containsKey("ERROR_MESSAGE")) {
                 response.put("ERROR_MESSAGE", userData.get("ERROR_MESSAGE"));
@@ -174,11 +209,13 @@ public class JbackController {
             }
 
             // Генерация JWT токена и добавление его в ответ
+            /*
             final String token = jwtUtil.generateToken(userId);
             if (dataService.saveToken(userId, token) != null)
             {
                 response.put("token", token);
             }
+            */
 
             response.putAll(userData);
             return ResponseEntity.ok(response);
@@ -194,7 +231,7 @@ public class JbackController {
         response.put("status", "success");
 
         if (userId != null) {
-            Map<String, Object> userData = dataService.getUser(userId);
+            Map<String, Object> userData = jbackDataService.getUser(userId);
 
             if (userData.containsKey("ERROR_MESSAGE")) {
                 response.put("ERROR_MESSAGE", userData.get("ERROR_MESSAGE"));
@@ -212,7 +249,7 @@ public class JbackController {
     @PostMapping("/transaction")
     public ResponseEntity<JbackCommonResponse> handleTransaction(@RequestBody TransactionRequest request)
     {
-        Optional<UserEntity> userOptional = dataRepository.findById(request.getUserId());
+        Optional<UserEntity> userOptional = JBackDataRepository.findById(request.getUserId());
 
         if (userOptional.isPresent())
         {
@@ -248,19 +285,20 @@ public class JbackController {
             currentItems.removeIf(item -> itemsDeleteIds.contains(item.getItemId()));
             currentItems.addAll(request.getItemsAdd());
 
-            // Вызов метода saveUnlocked для обработки списка unlock
-            final String unlockResults = dataService.saveUnlocked(user.getUserId(), request.getItemsUnlock());
-            if (!unlockResults.isEmpty())
-            {
-                // ToDo: set message
-            }
-
-            user.setData(JsonUtil.convertToJsonItems(currentItems));
-            dataRepository.save(user);
-
             JbackCommonResponse response = new JbackCommonResponse()
                     .setStatus("SUCCESS")
                     .setMessage("Items managed successfully");
+
+            final String unlockResults = jbackDataService.saveUnlocked(user.getUserId(), request.getItemsUnlock());
+            if (!unlockResults.isEmpty())
+            {
+                // ToDo: set message
+                response.setMessage(unlockResults);
+            }
+
+            user.setData(JsonUtil.convertToJsonItems(currentItems));
+            JBackDataRepository.save(user);
+
             response.setUserId(user.getUserId());
             response.setUserName(user.getUserName());
             response.setItems(currentItems);
@@ -290,11 +328,11 @@ public class JbackController {
         {
             for (Item item : itemsToDelete)
             {
-                Optional<UnlockedEntity> unlockedEntityOptional = unlockedRepository.
+                Optional<UnlockedEntity> unlockedEntityOptional = jbackUnlockedRepository.
                         findByUserIdAndItemId(userId, item.getItemId());
                 if (unlockedEntityOptional.isPresent())
                 {
-                    unlockedRepository.delete(unlockedEntityOptional.get());
+                    jbackUnlockedRepository.delete(unlockedEntityOptional.get());
                 }
             }
         }
@@ -305,7 +343,7 @@ public class JbackController {
         unlockedEntity.setUserId(userId);
         unlockedEntity.setItemId(itemUnlock.getItemId());
         unlockedEntity.setCount(1);
-        unlockedRepository.save(unlockedEntity);
+        jbackUnlockedRepository.save(unlockedEntity);
         response.put("message", "Item unlocked successfully");
 
         return ResponseEntity.ok(response);
@@ -324,14 +362,16 @@ public class JbackController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
-        if (userId == null || itemId == null) {
+        if (userId == null || itemId == null)
+        {
             response.put("ERROR_MESSAGE", "userId or itemId is missing");
             return ResponseEntity.badRequest().body(response);
         }
 
-        Optional<UnlockedEntity> unlockedEntityOptional = unlockedRepository.findByUserIdAndItemId(userId, itemId);
-        if (unlockedEntityOptional.isPresent()) {
-            unlockedRepository.delete(unlockedEntityOptional.get());
+        Optional<UnlockedEntity> unlockedEntityOptional = jbackUnlockedRepository.findByUserIdAndItemId(userId, itemId);
+        if (unlockedEntityOptional.isPresent())
+        {
+            jbackUnlockedRepository.delete(unlockedEntityOptional.get());
             response.put("message", "Item locked successfully");
         } else {
             response.put("ERROR_MESSAGE", "Unlocked item not found");

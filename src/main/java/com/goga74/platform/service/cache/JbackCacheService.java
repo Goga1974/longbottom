@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.goga74.platform.controller.dto.User;
+import com.goga74.platform.controller.dto.jback.User;
 
 public class JbackCacheService
 {

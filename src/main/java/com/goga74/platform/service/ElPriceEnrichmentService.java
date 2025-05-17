@@ -1,6 +1,6 @@
 package com.goga74.platform.service;
 
-import com.goga74.platform.controller.dto.PriceEntry;
+import com.goga74.platform.controller.dto.elprice.PriceEntry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

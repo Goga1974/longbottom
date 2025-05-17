@@ -1,9 +1,9 @@
 package com.goga74.platform.service;
 
-import com.goga74.platform.DB.entity.PriceData;
-import com.goga74.platform.DB.service.PriceDataService;
-import com.goga74.platform.controller.dto.PriceEntry;
-import com.goga74.platform.controller.dto.response.ElPriceApiResponse;
+import com.goga74.platform.DB.entity.elprice.PriceData;
+import com.goga74.platform.DB.dbservice.ElPriceDataService;
+import com.goga74.platform.controller.dto.elprice.PriceEntry;
+import com.goga74.platform.controller.response.elprice.ElPriceApiResponse;
 import com.goga74.platform.service.cache.ElPriceCacheService;
 import com.goga74.platform.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,17 +28,17 @@ public class ElPriceService
 	private String apiUrl;
 	
 	private final DateService dateService;
-	private final PriceDataService priceDataService;
+	private final ElPriceDataService elPriceDataService;
 	private final ElPriceEnrichmentService priceEnrichmentService;
 
 	private final ElPriceCacheService cacheService = new ElPriceCacheService(7200);
 
 	public ElPriceService(DateService dateService, ElPriceEnrichmentService priceEnrichmentService,
-						  PriceDataService priceDataService)
+						  ElPriceDataService elPriceDataService)
 	{
 		this.dateService = dateService;
 		this.priceEnrichmentService = priceEnrichmentService;
-		this.priceDataService = priceDataService;
+		this.elPriceDataService = elPriceDataService;
 	}
 
 	public List<PriceEntry> getTodayPrices()
@@ -50,7 +50,7 @@ public class ElPriceService
 		}
 
 		LocalDate today = LocalDate.now(ZoneOffset.UTC);
-		Optional<PriceData> existingPriceData = priceDataService.getPriceDataByDate(today);
+		Optional<PriceData> existingPriceData = elPriceDataService.getPriceDataByDate(today);
 		if (existingPriceData.isPresent())
 		{
 			// Возможно, вы захотите вернуть данные из существующей записи, если они уже есть
@@ -80,7 +80,7 @@ public class ElPriceService
 			if (existingPriceData.isEmpty())
 			{
 				String jsonData = JsonUtil.convertToJsonEntries(enrichedPrices);
-				priceDataService.savePriceData(today, jsonData);
+				elPriceDataService.savePriceData(today, jsonData);
 			}
 			return enrichedPrices;
 		}

@@ -1,6 +1,6 @@
 package com.goga74.platform.controller;
 
-import com.goga74.platform.controller.dto.PriceEntry;
+import com.goga74.platform.controller.dto.elprice.PriceEntry;
 import com.goga74.platform.service.ElPriceService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;

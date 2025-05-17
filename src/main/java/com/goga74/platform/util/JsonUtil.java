@@ -1,8 +1,8 @@
 package com.goga74.platform.util;
 
-import com.goga74.platform.DB.entity.ItemEntity;
-import com.goga74.platform.controller.dto.Item;
-import com.goga74.platform.controller.dto.PriceEntry;
+import com.goga74.platform.DB.entity.jback.ItemEntity;
+import com.goga74.platform.controller.dto.jback.Item;
+import com.goga74.platform.controller.dto.elprice.PriceEntry;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.goga74.platform.DB.repository;
 
-import com.goga74.platform.DB.entity.PriceData;
+import com.goga74.platform.DB.entity.elprice.PriceData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

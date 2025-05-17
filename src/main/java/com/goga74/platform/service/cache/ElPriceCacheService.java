@@ -1,6 +1,6 @@
 package com.goga74.platform.service.cache;
 
-import com.goga74.platform.controller.dto.PriceEntry;
+import com.goga74.platform.controller.dto.elprice.PriceEntry;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
