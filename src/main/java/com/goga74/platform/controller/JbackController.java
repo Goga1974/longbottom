@@ -4,10 +4,10 @@ import com.goga74.platform.DB.entity.jback.*;
 import com.goga74.platform.DB.repository.*;
 import com.goga74.platform.DB.dbservice.JbackDataService;
 import com.goga74.platform.controller.dto.jback.Item;
-import com.goga74.platform.controller.request.CreateRequest;
-import com.goga74.platform.controller.request.LoginRequest;
-import com.goga74.platform.controller.request.TransactionRequest;
-import com.goga74.platform.controller.request.UnlockRequest;
+import com.goga74.platform.controller.request.jback.CreateRequest;
+import com.goga74.platform.controller.request.jback.LoginRequest;
+import com.goga74.platform.controller.request.jback.TransactionRequest;
+import com.goga74.platform.controller.request.jback.UnlockRequest;
 import com.goga74.platform.controller.response.jback.JbackCommonResponse;
 import com.goga74.platform.service.PinService;
 import com.goga74.platform.util.JsonUtil;
@@ -74,7 +74,8 @@ public class JbackController {
             response.put("ERROR_MESSAGE", "userId is null");
             return ResponseEntity.ok(response);
         }
-        final String installId = request.getUserId();
+
+        final String installId = request.getInstallId();
         String pin = request.getPin();
         if (pin == null || pin.isEmpty()) // create pin
         {
@@ -202,31 +203,65 @@ public class JbackController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginRequest request) {
         Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
+        if (request == null)
+        {
+            response.put("ERROR_MESSAGE", "request is null");
+            return ResponseEntity.ok(response);
+        }
+        final String userId = request.getUserId();
+        if (userId == null)
+        {
+            response.put("ERROR_MESSAGE", "userId is null");
+            return ResponseEntity.ok(response);
+        }
+        final String pin = request.getPin();
+        if (pin == null || pin.isEmpty()) // create pin
+        {
+            response.put("ERROR_MESSAGE", "User already exists and pin does not match or pin is empty");
+            return ResponseEntity.ok(response);
+        }
+        final String installId = request.getInstallId();
+        List<InstallEntity> installList = jbackInstallRepository.findByUserId(userId);
 
-        if (request != null && request.getUserId() != null) {
-            final String userId = request.getUserId();
-            Map<String, Object> userData = jbackDataService.getUser(userId);
-
-            if (userData.containsKey("ERROR_MESSAGE")) {
-                response.put("ERROR_MESSAGE", userData.get("ERROR_MESSAGE"));
-                return ResponseEntity.ok(response);
-            }
-
-            // Генерация JWT токена и добавление его в ответ
-            /*
-            final String token = jwtUtil.generateToken(userId);
-            if (dataService.saveToken(userId, token) != null)
+        boolean exists = false;
+        for (InstallEntity install : installList)
+        {
+            if (installId.equals(install.getInstallId()))
             {
-                response.put("token", token);
+                exists = true;
+                break;
             }
-            */
+        }
+        if (installList.isEmpty())
+        {
+            response.put("ERROR_MESSAGE", "Empty install id");
+        }
+        if (!exists && !installList.isEmpty())
+        {
+            response.put("ERROR_MESSAGE", "Wrong install id");
+        }
 
-            response.putAll(userData);
+        Map<String, Object> userData = jbackDataService.getUser(userId);
+        if (userData.containsKey("ERROR_MESSAGE"))
+        {
+            response.put("ERROR_MESSAGE", userData.get("ERROR_MESSAGE"));
             return ResponseEntity.ok(response);
         }
 
-        response.put("ERROR_MESSAGE", "userId is null");
+        // Генерация JWT токена и добавление его в ответ
+        /*
+        final String token = jwtUtil.generateToken(userId);
+        if (dataService.saveToken(userId, token) != null)
+        {
+            response.put("token", token);
+        }
+        */
+
+        response.putAll(userData);
+        if (response.get("ERROR_MESSAGE") != null)
+        {
+            response.put("status", "success");
+        }
         return ResponseEntity.ok(response);
     }
 

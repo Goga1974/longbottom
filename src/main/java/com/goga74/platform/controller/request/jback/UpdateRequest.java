@@ -1,4 +1,4 @@
-package com.goga74.platform.controller.request;
+package com.goga74.platform.controller.request.jback;
 
 public class UpdateRequest {
 

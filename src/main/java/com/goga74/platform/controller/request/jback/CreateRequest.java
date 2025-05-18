@@ -1,4 +1,4 @@
-package com.goga74.platform.controller.request;
+package com.goga74.platform.controller.request.jback;
 
 import com.goga74.platform.controller.dto.jback.Item;
 import com.google.gson.annotations.Expose;
