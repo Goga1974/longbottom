@@ -9,9 +9,9 @@ public class LoginRequest
     @Expose
     private String installId;
     @Expose
-    private String username; // Corresponds to `user_name` in the table
-    @Expose
     private String pin; // Corresponds to `pin` in the table
+    @Expose
+    private String username; // Corresponds to `user_name` in the table
 
     public String getUserId()
     {
@@ -28,21 +28,25 @@ public class LoginRequest
         return installId;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public LoginRequest setUsername(String username) {
-        this.username = username;
-        return this;
-    }
-
-    public String getPin() {
+    public String getPin()
+    {
         return this.pin;
     }
 
-    public LoginRequest setPin(String password) {
+    public LoginRequest setPin(String password)
+    {
         this.pin = password;
+        return this;
+    }
+
+    public String getUsername()
+    {
+        return username;
+    }
+
+    public LoginRequest setUsername(String username)
+    {
+        this.username = username;
         return this;
     }
 }

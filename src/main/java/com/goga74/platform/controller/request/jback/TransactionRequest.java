@@ -39,6 +39,26 @@ public class TransactionRequest
         this.userId = userId;
     }
 
+    public String getInstallId()
+    {
+        return installId;
+    }
+
+    public void setInstallId(final String installId)
+    {
+        this.installId = installId;
+    }
+
+    public String getPin()
+    {
+        return pin;
+    }
+
+    public void setPin(final String pin)
+    {
+        this.pin = pin;
+    }
+
     public List<Item> getItemsDelete()
     {
         return this.delete;
@@ -68,4 +88,5 @@ public class TransactionRequest
     {
         this.unlock = itemsUnlock;
     }
+
 }

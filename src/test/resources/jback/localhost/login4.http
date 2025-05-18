@@ -1,0 +1,9 @@
+### Login User
+POST http://localhost:80/api/login
+Content-Type: application/json
+
+{
+  "userId": "204",
+  "installId": "1t4yJKpo21sA",
+  "pin": "7035"
+}

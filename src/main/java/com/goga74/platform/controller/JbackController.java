@@ -217,50 +217,68 @@ public class JbackController {
         final String pin = request.getPin();
         if (pin == null || pin.isEmpty()) // create pin
         {
-            response.put("ERROR_MESSAGE", "User already exists and pin does not match or pin is empty");
+            response.put("ERROR_MESSAGE", "User already exists and pin is empty");
             return ResponseEntity.ok(response);
         }
-        final String installId = request.getInstallId();
-        List<InstallEntity> installList = jbackInstallRepository.findByUserId(userId);
 
-        boolean exists = false;
-        for (InstallEntity install : installList)
+        try
         {
-            if (installId.equals(install.getInstallId()))
+            Optional<UserEntity> existingUser = JBackDataRepository.findById(request.getUserId());
+            if (existingUser.isEmpty())
             {
-                exists = true;
-                break;
+                response.put("ERROR_MESSAGE", "User already exists and pin does not match or pin is empty");
+                return ResponseEntity.ok(response);
             }
-        }
-        if (installList.isEmpty())
-        {
-            response.put("ERROR_MESSAGE", "Empty install id");
-        }
-        if (!exists && !installList.isEmpty())
-        {
-            response.put("ERROR_MESSAGE", "Wrong install id");
-        }
+            UserEntity exUser = existingUser.get();
+            if (!pin.equals(exUser.getPin()))
+            {
+                response.put("ERROR_MESSAGE", "User already exists and pin does not match");
+                return ResponseEntity.ok(response);
+            } else {
+                final String installId = request.getInstallId();
+                List<InstallEntity> installList = jbackInstallRepository.findByUserId(userId);
 
-        Map<String, Object> userData = jbackDataService.getUser(userId);
-        if (userData.containsKey("ERROR_MESSAGE"))
-        {
-            response.put("ERROR_MESSAGE", userData.get("ERROR_MESSAGE"));
-            return ResponseEntity.ok(response);
-        }
+                boolean exists = false;
+                for (InstallEntity install : installList)
+                {
+                    if (installId.equals(install.getInstallId()))
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (installList.isEmpty())
+                {
+                    response.put("ERROR_MESSAGE", "Empty install id");
+                }
+                if (!exists && !installList.isEmpty())
+                {
+                    response.put("ERROR_MESSAGE", "Wrong install id");
+                }
 
-        // Генерация JWT токена и добавление его в ответ
-        /*
-        final String token = jwtUtil.generateToken(userId);
-        if (dataService.saveToken(userId, token) != null)
-        {
-            response.put("token", token);
-        }
-        */
+                Map<String, Object> userData = jbackDataService.getUser(userId);
+                if (userData.containsKey("ERROR_MESSAGE")) {
+                    response.put("ERROR_MESSAGE", userData.get("ERROR_MESSAGE"));
+                    return ResponseEntity.ok(response);
+                }
 
-        response.putAll(userData);
-        if (response.get("ERROR_MESSAGE") != null)
-        {
-            response.put("status", "success");
+                // Генерация JWT токена и добавление его в ответ
+                /*
+                final String token = jwtUtil.generateToken(userId);
+                if (dataService.saveToken(userId, token) != null)
+                {
+                    response.put("token", token);
+                }
+                */
+
+                response.putAll(userData);
+                if (response.get("ERROR_MESSAGE") != null)
+                {
+                    response.put("status", "success");
+                }
+            }
+        } catch (Exception e) {
+            response.put("ERROR_MESSAGE", "An error occurred: " + e.getMessage());
         }
         return ResponseEntity.ok(response);
     }

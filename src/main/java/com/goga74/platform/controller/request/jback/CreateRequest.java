@@ -11,9 +11,9 @@ public class CreateRequest {
     @Expose
     private String installId;
     @Expose
-    private String userName;
+    private String pin;            ;
     @Expose
-    private String pin;
+    private String userName;
     @Expose
     private List<Item> items;
     @Expose
@@ -53,16 +53,6 @@ public class CreateRequest {
         this.installId = installId;
     }
 
-    public String getUserName()
-    {
-        return userName;
-    }
-
-    public void setUserName(final String userName)
-    {
-        this.userName = userName;
-    }
-
     public String getPin()
     {
         return pin;
@@ -71,6 +61,16 @@ public class CreateRequest {
     public void setPin(final String pin)
     {
         this.pin = pin;
+    }
+
+    public String getUserName()
+    {
+        return userName;
+    }
+
+    public void setUserName(final String userName)
+    {
+        this.userName = userName;
     }
 
     public List<Item> getItems()
