@@ -3,7 +3,7 @@ package com.goga74.platform.DB.entity.jback;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "item")
+@Table(name = "jback_item")
 public class ItemEntity {
 
     @Id

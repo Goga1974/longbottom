@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class JsonPriceController {
+public class ElPriceJsonController {
 
     private final ElPriceService elPriceService;
 
-    public JsonPriceController(ElPriceService elPriceService) {
+    public ElPriceJsonController(ElPriceService elPriceService) {
         this.elPriceService = elPriceService;
     }
 

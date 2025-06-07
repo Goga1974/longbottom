@@ -6,7 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.CRC32;
 
 @Service
-public class WebParsingService {
+public class WebParsingService
+{
 
     private String url;
     private String title;
@@ -14,18 +15,19 @@ public class WebParsingService {
     private long pageSize;
     private String content;
 
-    // Пустой конструктор
-    public WebParsingService() {
+    public WebParsingService()
+    {
     }
 
-    // Метод для установки URL и обновления данных
-    public void setUrl(String url) {
+    public void setUrl(String url)
+    {
         this.url = url;
         fetchDataFromUrl();
     }
 
     /*
-    private void fetchDataFromUrl() {
+    private void fetchDataFromUrl()
+    {
         if (url == null || url.isEmpty()) {
             throw new IllegalArgumentException("URL cannot be null or empty");
         }
@@ -43,19 +45,22 @@ public class WebParsingService {
     }
     */
 
-    private void fetchDataFromUrl() {
-        if (url == null || url.isEmpty()) {
+    private void fetchDataFromUrl()
+    {
+        if (url == null || url.isEmpty())
+        {
             throw new IllegalArgumentException("URL cannot be null or empty");
         }
 
-        try (Playwright playwright = Playwright.create()) {
-            Browser browser = playwright.chromium().launch();
+        try (Playwright playwright = Playwright.create();
+             Browser browser = playwright.chromium().launch())
+        {
             Page page = browser.newPage();
             page.navigate(url);
 
             this.title = page.title();
 
-            // Извлечение текста из тега body
+            // get text from body tag
             Locator bodyLocator = page.locator("body");
             if (bodyLocator.count() > 0)
             {
@@ -70,9 +75,14 @@ public class WebParsingService {
             this.pageSize = this.content.getBytes(StandardCharsets.UTF_8).length;
             this.crc = calculateCRC(this.content);
         }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
     }
 
-    private long calculateCRC(String text) {
+    private long calculateCRC(String text)
+    {
         CRC32 crc = new CRC32();
         crc.update(text.getBytes(StandardCharsets.UTF_8));
         return crc.getValue();
@@ -94,7 +104,8 @@ public class WebParsingService {
         return pageSize;
     }
 
-    public String getContent() {
+    public String getContent()
+    {
         return content;
     }
 }

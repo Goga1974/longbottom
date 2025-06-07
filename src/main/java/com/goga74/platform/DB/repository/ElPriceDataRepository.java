@@ -8,6 +8,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
-public interface PriceDataRepository extends JpaRepository<PriceData, Long> {
+public interface ElPriceDataRepository extends JpaRepository<PriceData, Long> {
     Optional<PriceData> findByDate(LocalDate date);
 }

@@ -37,19 +37,23 @@ public class WebParserController {
     public ResponseEntity<String> parseUrl(@RequestBody Map<String, String> request)
     {
         String url = request.get("url");
-        if (url == null || url.isEmpty()) {
+        if (url == null || url.isEmpty())
+        {
             return ResponseEntity.badRequest().body("URL is missing");
         }
 
-        try {
+        try
+        {
             webParsingService.setUrl(url);
             String content = webParsingService.getContent();
 
-            if (content != null) {
+            if (content != null)
+            {
                 long contentSize = content.getBytes(StandardCharsets.UTF_8).length;
 
-                // Проверка размера текста без HTML-тегов
-                if (contentSize < K500) {
+                // Check text size w/o tags
+                if (contentSize < K500)
+                {
                     requestRepository.deleteByUrl(url);
 
                     WebRequestEntity requestEntity = new WebRequestEntity();
@@ -63,17 +67,22 @@ public class WebParserController {
                     requestEntity.setTitle(webParsingService.getTitle());
                     requestEntity.setSize(webParsingService.getPageSize());
 
-                    if (contentSize < K100) {
+                    if (contentSize < K100)
+                    {
                         requestEntity.setContent(content);
                     }
                     requestRepository.save(requestEntity);
 
                     return ResponseEntity.ok("Request processed successfully");
                 }
-            } else {
+            }
+            else
+            {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Content size is null");
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing the URL: " + e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Content size is too large");

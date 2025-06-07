@@ -3,7 +3,7 @@ package com.goga74.platform.DB.entity.jback;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "unlocked")
+@Table(name = "jback_unlocked")
 public class UnlockedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

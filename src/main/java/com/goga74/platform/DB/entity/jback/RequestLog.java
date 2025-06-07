@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "request_log")
+@Table(name = "jback_request_log")
 public class RequestLog {
 
     @Id
@@ -26,7 +26,8 @@ public class RequestLog {
 
     public RequestLog() {}
 
-    public RequestLog(String userId, String ipAddress, String userAgent, LocalDateTime requestTime) {
+    public RequestLog(String userId, String ipAddress, String userAgent, LocalDateTime requestTime)
+    {
         this.userId = userId;
         this.ipAddress = ipAddress;
         this.userAgent = userAgent;

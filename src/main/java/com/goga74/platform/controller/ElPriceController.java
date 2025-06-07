@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.time.ZonedDateTime;
 
 @Controller
-public class PriceController {
+public class ElPriceController {
 	
 	private final ElPriceService elPriceService;
 	
-	public PriceController(ElPriceService elPriceService) {this.elPriceService = elPriceService;}
+	public ElPriceController(ElPriceService elPriceService) {this.elPriceService = elPriceService;}
 	
 	@GetMapping("/prices")
 	public String today(Model model) {

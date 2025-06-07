@@ -10,3 +10,11 @@ CREATE TABLE IF NOT EXISTS `install` (
     KEY `request_time` (`request_time`)
     ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+RENAME TABLE `install` TO `jback_install`,
+`item` TO `jback_item`,
+`token` TO `jback_token`,
+`user` TO `jback_user`,
+`unlocked` TO `jback_unlocked`;
+
+RENAME TABLE `request_log` TO `jback_request_log`;
+
